@@ -1,78 +1,96 @@
-# Claude Skills 构建完整指南（ClaudeSkillsCreateSkills）
+# lute-skills-create
 
-本仓库提供 **ClaudeSkillsCreateSkills** 这一 Agent Skill：指导创建符合 [Agent Skills 开放标准](https://agentskills.io/specification)、适用于 **Claude Code** 与 **Cursor** 的 Skills，并支持通过 add-skill / openskills 从 GitHub 安装与分发。
+`lute-skills-create` 是一个可复用的 Agent Skill，用于指导创建、评审、发布符合 [Agent Skills 开放标准](https://agentskills.io/specification) 的 Skills，适用于 Claude Code、Cursor 及兼容该标准的其他工具。
 
 ## 安装
 
-### Cursor
-
-在项目根或任意目录执行（安装到当前项目或自动检测的 agent 目录）：
-
-```bash
-npx add-skill <owner>/<repo>
-```
-
-仅安装本 Skill（若仓库含多个 skill 时）：
-
-```bash
-npx add-skill <owner>/<repo> --skill claude-skills-create-skills
-```
-
-全局安装（所有项目可用）：
-
-```bash
-npx add-skill <owner>/<repo> -g
-```
-
-安装后，Cursor 会将 skill 放入 `.cursor/skills/`（项目级）或 `~/.cursor/skills/`（用户级），可通过 `/claude-skills-create-skills` 或在与「创建 skill、写 SKILL、Claude Skills、Agent Skills」相关的对话中由 agent 自动调用。
-
 ### OpenSkills
 
+安装：
+
 ```bash
-npx openskills install <owner>/<repo>
+npx openskills install zjgulai/Claude_Skills_Create_Skills
 ```
 
-默认可能安装到 `./.claude/skills` 或 `./.agent/skills`；使用 `--global` 时以工具文档为准（如 `~/.claude/skills`）。
+更新：
+
+```bash
+npx openskills update lute-skills-create
+```
+
+如果你的 OpenSkills 版本不支持 `update` 子命令，可重新执行 `install` 完成更新。
 
 ### Claude Code
 
-- **项目级**：将本仓库中的 `ClaudeSkillsCreateSkills` 目录复制到项目下的 `.claude/skills/`。
-- **用户级**：复制到 `~/.claude/skills/`。
-- 也可通过 Claude Code 的 Plugin 机制安装（若已配置从 GitHub 加载 skill 的插件）。
+项目级安装：
 
-## 目录结构
-
+```bash
+mkdir -p .claude/skills
+cp -R lute-skills-create .claude/skills/
 ```
+
+用户级安装：
+
+```bash
+mkdir -p ~/.claude/skills
+cp -R lute-skills-create ~/.claude/skills/
+```
+
+安装后可直接用：
+
+```text
+/lute-skills-create
+```
+
+也可以让 agent 在你提到“创建 skill、写 SKILL、frontmatter、openskills、发布 skill”等需求时自动匹配调用。
+
+### Cursor / 兼容工具
+
+如果通过 OpenSkills 安装，兼容工具通常会把该 Skill 安装到各自约定的 Skills 目录。若需手动安装，可将 `lute-skills-create/` 复制到对应工具的项目级或用户级 skills 目录。
+
+## 为什么当前仓库可直接安装
+
+本仓库采用“仓库根说明文件 + 单 Skill 目录”的发布结构：
+
+```text
 .
 ├── README.md
 ├── LICENSE
-├── PLAN_ClaudeSkillsCreateSkills.md   # 构建本 Skill 的计划文档
-└── ClaudeSkillsCreateSkills/          # Skill 包（add-skill 会识别此目录）
-    ├── SKILL.md                        # 主说明（框架、组件、写作原则、发布与校验）
-    ├── reference.md                    # frontmatter 与规范、路径、安装命令速查
-    ├── examples.md                     # 2–3 个完整 Skill 示例
+├── .gitignore
+└── lute-skills-create/
+    ├── SKILL.md
+    ├── reference.md
+    ├── examples.md
     └── scripts/
-        └── validate-skill.sh           # 发布前校验（name、description、SKILL.md）
+        └── validate-skill.sh
 ```
 
-## 与 Agent Skills 标准的关系
+其中 `lute-skills-create/` 目录名与 `SKILL.md` 中的 `name: lute-skills-create` 保持一致，这更符合 Agent Skills 规范，也更适合安装工具直接识别。
 
-本 Skill 遵循 [Agent Skills 规范](https://agentskills.io/specification)（agentskills.io），并融合 Claude Code 官方文档中的扩展（如 `disable-model-invocation`、`context: fork`、参数占位符）。在 Cursor、Claude Code、以及支持该开放标准的其他 agent 中均可使用。
+## 使用
 
-## 校验
+本 Skill 适用于以下场景：
 
-在 `ClaudeSkillsCreateSkills` 目录下执行：
+- 创建新的 Agent Skill / Claude Skill
+- 修改 `SKILL.md`、frontmatter、安装说明
+- 将现有流程、规范或文档提炼为可复用 Skill
+- 检查 Skill 的可发现性、兼容性和发布质量
 
-```bash
-./scripts/validate-skill.sh
-```
+主要命令与动作：
 
-或校验任意 skill 目录：
+- 通过 slash command：`/lute-skills-create`
+- 运行校验脚本：`./lute-skills-create/scripts/validate-skill.sh`
+- 校验任意 Skill：`./lute-skills-create/scripts/validate-skill.sh /path/to/skill-dir`
 
-```bash
-./scripts/validate-skill.sh /path/to/skill-dir
-```
+## 发布检查
+
+在发布前，建议至少确认：
+
+- `lute-skills-create/SKILL.md` 中的 `name` 与目录名一致
+- `description` 包含明确触发条件
+- 主文件保持精简，参考内容放到 `reference.md`
+- 安装命令、目录结构、slash command 名称全部一致
 
 ## 许可证
 
-见 [LICENSE](LICENSE) 文件。
+见 [LICENSE](LICENSE)。
